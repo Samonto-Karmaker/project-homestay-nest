@@ -35,4 +35,13 @@ export abstract class AbstractRepository<
         }
         return document
     }
+
+    async find(): Promise<DocumentType[]> {
+        const documents = await this.model.find().lean<DocumentType[]>(true)
+        if (!documents) {
+            this.logger.error(`No documents found`)
+            throw new NotFoundException(`No documents found`)
+        }
+        return documents
+    }
 }
