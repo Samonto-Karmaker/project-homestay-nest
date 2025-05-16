@@ -14,6 +14,10 @@ export abstract class AbstractRepository<
             ...document,
             _id: new Types.ObjectId(),
         })
-        return (await createdDocument.save()).toJSON() as DocumentType
+
+        // First cast to unknown to avoid type errors then cast to DocumentType
+        return (
+            await createdDocument.save()
+        ).toJSON() as unknown as DocumentType
     }
 }
