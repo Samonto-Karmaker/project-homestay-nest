@@ -1,6 +1,6 @@
-import { Logger } from "@nestjs/common"
+import { Logger, NotFoundException } from "@nestjs/common"
 import { AbstractDocument } from "./abstract.schema"
-import { Model, Types } from "mongoose"
+import { FilterQuery, Model, Types } from "mongoose"
 
 export abstract class AbstractRepository<
     DocumentType extends AbstractDocument,
@@ -19,5 +19,20 @@ export abstract class AbstractRepository<
         return (
             await createdDocument.save()
         ).toJSON() as unknown as DocumentType
+    }
+
+    async findOne(filter: FilterQuery<DocumentType>): Promise<DocumentType> {
+        const document = await this.model
+            .findOne(filter)
+            .lean<DocumentType>(true)
+        if (!document) {
+            this.logger.error(
+                `Document not found with filter: ${JSON.stringify(filter)}`
+            )
+            throw new NotFoundException(
+                `Document not found with filter: ${JSON.stringify(filter)}`
+            )
+        }
+        return document
     }
 }
