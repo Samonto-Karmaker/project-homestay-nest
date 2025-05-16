@@ -22,7 +22,7 @@ export abstract class AbstractRepository<
         ).toJSON() as unknown as DocumentType
     }
 
-    // Read
+    // Read individual
     async findOne(filter: FilterQuery<DocumentType>): Promise<DocumentType> {
         const document = await this.model
             .findOne(filter)
@@ -38,9 +38,11 @@ export abstract class AbstractRepository<
         return document
     }
 
-    // Read one
-    async find(): Promise<DocumentType[]> {
-        const documents = await this.model.find().lean<DocumentType[]>(true)
+    // Read All
+    async find(filter: FilterQuery<DocumentType>): Promise<DocumentType[]> {
+        const documents = await this.model
+            .find(filter)
+            .lean<DocumentType[]>(true)
         if (!documents) {
             this.logger.error(`No documents found`)
             throw new NotFoundException(`No documents found`)
