@@ -6,7 +6,7 @@ services:
       target: development
     command: npm run start:dev reservations
     env_file:
-      - ./.env
+      - ./apps/reservations/.env
     environment:
       - MONGODB_URI=mongodb://mongo:27017/project-homestay-nest
     ports:
@@ -22,7 +22,7 @@ services:
       target: development
     command: npm run start:dev auth
     env_file:
-      - ./.env
+      - ./apps/auth/.env
     environment:
       - MONGODB_URI=mongodb://mongo:27017/project-homestay-nest
     ports:
