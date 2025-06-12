@@ -1,4 +1,8 @@
-import { Injectable, UnauthorizedException } from "@nestjs/common"
+import {
+    ConflictException,
+    Injectable,
+    UnauthorizedException,
+} from "@nestjs/common"
 import { UserRepository } from "./user.repository"
 import { CreateUserDto } from "./dto/create-user.dto"
 import { compare, hash } from "bcryptjs"
@@ -8,6 +12,12 @@ export class UserService {
     constructor(private readonly userRepository: UserRepository) {}
 
     async create(createUserDto: CreateUserDto) {
+        const existingUser = await this.userRepository.find({
+            email: createUserDto.email,
+        })
+        if (existingUser.length > 0) {
+            throw new ConflictException("Email already in use")
+        }
         return this.userRepository.create({
             ...createUserDto,
             password: await hash(createUserDto.password, 10),
