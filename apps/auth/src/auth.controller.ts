@@ -1,7 +1,7 @@
 import { Controller, Get, Post, Res, UseGuards } from "@nestjs/common"
 import { AuthService } from "./auth.service"
 import { LocalAuthGuard } from "./guards/local-auth.guard"
-import { CurrentUser } from "./user/decorator/current-user.decorator"
+import { CurrentUser } from "@app/common/decorators/current-user.decorator"
 import { User } from "./entities/user.entity"
 import { Response } from "express"
 
