@@ -22,4 +22,9 @@ export class UserService {
         }
         return user
     }
+
+    async getUserById(id: string) {
+        const user = await this.userRepository.findOne({ _id: id })
+        return user
+    }
 }
