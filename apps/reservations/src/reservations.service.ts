@@ -1,20 +1,35 @@
-import { Injectable } from "@nestjs/common"
+/* eslint-disable @typescript-eslint/no-unsafe-member-access */
+/* eslint-disable @typescript-eslint/no-unsafe-assignment */
+import { Inject, Injectable } from "@nestjs/common"
 import { CreateReservationDto } from "./dto/create-reservation.dto"
 import { UpdateReservationDto } from "./dto/update-reservation.dto"
 import { ReservationsRepository } from "./reservations.repository"
+import { PAYMENT_SERVICE } from "@app/common"
+import { ClientProxy } from "@nestjs/microservices"
+import { map } from "rxjs"
 
 @Injectable()
 export class ReservationsService {
     constructor(
-        private readonly reservationsRepository: ReservationsRepository
+        private readonly reservationsRepository: ReservationsRepository,
+        @Inject(PAYMENT_SERVICE) private readonly paymentService: ClientProxy
     ) {}
 
     create(createReservationDto: CreateReservationDto, userId: string) {
-        return this.reservationsRepository.create({
-            ...createReservationDto,
-            timestamp: new Date(),
-            userId: userId,
-        })
+        return this.paymentService
+            .send("createPaymentIntent", {
+                ...createReservationDto.paymentIntent,
+            })
+            .pipe(
+                map(res => {
+                    return this.reservationsRepository.create({
+                        ...createReservationDto,
+                        invoiceId: res.id,
+                        userId,
+                        timestamp: new Date(),
+                    })
+                })
+            )
     }
 
     findAll() {
