@@ -1,7 +1,7 @@
 import { Injectable } from "@nestjs/common"
 import { ConfigService } from "@nestjs/config"
 import Stripe from "stripe"
-import { CreatePaymentIntentDto } from "./dto/create-payment-intent.dto"
+import { CreatePaymentIntentDto } from "@app/common/dto/create-payment-intent.dto"
 
 @Injectable()
 export class PaymentService {
