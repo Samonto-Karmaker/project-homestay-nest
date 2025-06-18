@@ -3,6 +3,7 @@ import { PaymentController } from "./payment.controller"
 import { PaymentService } from "./payment.service"
 import * as Joi from "joi"
 import { ConfigModule } from "@nestjs/config"
+import { LoggerModule } from "@app/common"
 
 @Module({
     imports: [
@@ -13,6 +14,7 @@ import { ConfigModule } from "@nestjs/config"
                 PORT: Joi.number().default(3003), // Default port
             }),
         }),
+        LoggerModule,
     ],
     controllers: [PaymentController],
     providers: [PaymentService],
