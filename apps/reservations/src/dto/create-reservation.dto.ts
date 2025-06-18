@@ -1,6 +1,13 @@
-/* eslint-disable @typescript-eslint/no-unsafe-call */
+import { CreatePaymentIntentDto } from "@app/common/dto/create-payment-intent.dto"
 import { Type } from "class-transformer"
-import { IsDate, IsNotEmpty, IsString } from "class-validator"
+import {
+    IsDate,
+    IsDefined,
+    IsNotEmpty,
+    IsNotEmptyObject,
+    IsString,
+    ValidateNested,
+} from "class-validator"
 
 export class CreateReservationDto {
     @IsDate()
@@ -18,4 +25,10 @@ export class CreateReservationDto {
     @IsNotEmpty()
     @IsString()
     invoiceId: string
+
+    @IsDefined()
+    @IsNotEmptyObject()
+    @ValidateNested()
+    @Type(() => CreatePaymentIntentDto)
+    paymentIntent: CreatePaymentIntentDto
 }
