@@ -1,6 +1,6 @@
 import Stripe from "stripe"
 
-export class CreateChargeDto {
+export class CreatePaymentIntentDto {
     card: Stripe.PaymentMethodCreateParams.Card
     amount: number
 }
