@@ -15,8 +15,4 @@ export class PaymentService {
             }
         )
     }
-
-    getHello(): string {
-        return "Hello World!"
-    }
 }
