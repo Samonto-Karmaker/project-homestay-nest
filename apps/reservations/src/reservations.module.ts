@@ -1,7 +1,12 @@
 import { Module } from "@nestjs/common"
 import { ReservationsService } from "./reservations.service"
 import { ReservationsController } from "./reservations.controller"
-import { AUTH_SERVICE, DbModule, LoggerModule } from "@app/common"
+import {
+    AUTH_SERVICE,
+    DbModule,
+    LoggerModule,
+    PAYMENT_SERVICE,
+} from "@app/common"
 import { ReservationsRepository } from "./reservations.repository"
 import { Reservation, ReservationsSchema } from "./entities/reservation.entity"
 import { ConfigModule, ConfigService } from "@nestjs/config"
@@ -23,6 +28,8 @@ import { ClientsModule, Transport } from "@nestjs/microservices"
                 HTTP_PORT: Joi.number().default(3000), // Default port
                 AUTH_HOST: Joi.string().default("localhost"),
                 AUTH_PORT: Joi.number().default(3002),
+                PAYMENT_HOST: Joi.string().default("localhost"),
+                PAYMENT_PORT: Joi.number().default(3003),
             }),
         }),
         ClientsModule.registerAsync([
@@ -33,6 +40,19 @@ import { ClientsModule, Transport } from "@nestjs/microservices"
                     options: {
                         host: configService.get<string>("AUTH_HOST"),
                         port: configService.get<number>("AUTH_PORT"),
+                    },
+                }),
+                inject: [ConfigService],
+            },
+        ]),
+        ClientsModule.registerAsync([
+            {
+                name: PAYMENT_SERVICE,
+                useFactory: (configService: ConfigService) => ({
+                    transport: Transport.TCP,
+                    options: {
+                        host: configService.get<string>("PAYMENT_HOST"),
+                        port: configService.get<number>("PAYMENT_PORT"),
                     },
                 }),
                 inject: [ConfigService],
