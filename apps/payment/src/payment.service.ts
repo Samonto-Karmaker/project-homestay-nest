@@ -20,18 +20,13 @@ export class PaymentService {
         )
     }
 
-    async createPaymentIntent({ card, amount }: CreatePaymentIntentDto) {
+    async createPaymentIntent({ amount }: CreatePaymentIntentDto) {
         try {
-            const paymentMethod = await this.stripe.paymentMethods.create({
-                type: "card",
-                card,
-            })
-
             const paymentIntent = await this.stripe.paymentIntents.create({
                 amount: Math.round(amount * 100), // Convert to cents and rounded to avoid floating point issues
                 currency: "usd",
                 confirm: true,
-                payment_method: paymentMethod.id,
+                payment_method: "pm_card_visa", // Replace with actual card ID or method
                 payment_method_types: ["card"],
             })
 

@@ -15,6 +15,11 @@ async function bootstrap() {
         },
     })
     app.useLogger(app.get(Logger))
+    app.enableCors({
+        origin: "*", // For development only! In production, specify allowed origins
+        methods: "GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS",
+        credentials: true,
+    })
     await app.startAllMicroservices()
 }
 bootstrap()
