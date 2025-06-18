@@ -1,10 +1,20 @@
 import { NestFactory } from "@nestjs/core"
 import { PaymentModule } from "./payment.module"
 import { ConfigService } from "@nestjs/config"
+import { Transport } from "@nestjs/microservices"
+import { Logger } from "nestjs-pino"
 
 async function bootstrap() {
     const app = await NestFactory.create(PaymentModule)
     const configService = app.get(ConfigService)
-    await app.listen(configService.get<number>("HTTP_PORT", 3003))
+    app.connectMicroservice({
+        transport: Transport.TCP,
+        options: {
+            host: "0.0.0.0",
+            port: configService.get<number>("PORT", 3003),
+        },
+    })
+    app.useLogger(app.get(Logger))
+    await app.startAllMicroservices()
 }
 bootstrap()

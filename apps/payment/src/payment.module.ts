@@ -10,7 +10,7 @@ import { ConfigModule } from "@nestjs/config"
             isGlobal: true,
             envFilePath: "apps/payment/.env",
             validationSchema: Joi.object({
-                HTTP_PORT: Joi.number().default(3003), // Default port
+                PORT: Joi.number().default(3003), // Default port
             }),
         }),
     ],
