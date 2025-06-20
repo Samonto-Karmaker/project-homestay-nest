@@ -47,6 +47,22 @@ services:
       - .:/usr/src/app
     depends_on:
       - mongo
+  notification:
+    build:
+      context: .
+      dockerfile: ./apps/notification/Dockerfile
+      target: development
+    command: npm run start:dev notification
+    env_file:
+      - ./apps/notification/.env
+    environment:
+      - MONGODB_URI=mongodb://mongo:27017/project-homestay-nest
+    ports:
+      - "3004:3004"
+    volumes:
+      - .:/usr/src/app
+    depends_on:
+      - mongo
   mongo:
     image: mongo:latest
     container_name: reservations_mongo
