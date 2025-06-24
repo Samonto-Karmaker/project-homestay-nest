@@ -1,7 +1,7 @@
 import { Controller, UsePipes, ValidationPipe } from "@nestjs/common"
 import { PaymentService } from "./payment.service"
-import { CreatePaymentIntentDto } from "@app/common/dto/create-payment-intent.dto"
 import { MessagePattern, Payload } from "@nestjs/microservices"
+import { CreatePaymentIntentWithEmailDto } from "./dto/create-payment-intent-with-email.dto"
 
 @Controller()
 export class PaymentController {
@@ -10,7 +10,7 @@ export class PaymentController {
     @MessagePattern("createPaymentIntent")
     @UsePipes(new ValidationPipe())
     createPaymentIntent(
-        @Payload() createPaymentIntentDto: CreatePaymentIntentDto
+        @Payload() createPaymentIntentDto: CreatePaymentIntentWithEmailDto
     ) {
         return this.paymentService.createPaymentIntent(createPaymentIntentDto)
     }

@@ -1,13 +1,19 @@
-import { Injectable } from "@nestjs/common"
+import { Inject, Injectable } from "@nestjs/common"
 import { ConfigService } from "@nestjs/config"
 import Stripe from "stripe"
-import { CreatePaymentIntentDto } from "@app/common/dto/create-payment-intent.dto"
+import { NOTIFICATION_SERVICE } from "@app/common"
+import { ClientProxy } from "@nestjs/microservices"
+import { CreatePaymentIntentWithEmailDto } from "./dto/create-payment-intent-with-email.dto"
 
 @Injectable()
 export class PaymentService {
     private readonly stripe: Stripe
 
-    constructor(private readonly configService: ConfigService) {
+    constructor(
+        private readonly configService: ConfigService,
+        @Inject(NOTIFICATION_SERVICE)
+        private readonly notificationService: ClientProxy
+    ) {
         this.stripe = new Stripe(
             this.configService.get<string>("STRIPE_SECRET_KEY") ??
                 (() => {
@@ -20,7 +26,10 @@ export class PaymentService {
         )
     }
 
-    async createPaymentIntent({ amount }: CreatePaymentIntentDto) {
+    async createPaymentIntent({
+        amount,
+        email,
+    }: CreatePaymentIntentWithEmailDto) {
         try {
             const paymentIntent = await this.stripe.paymentIntents.create({
                 amount: Math.round(amount * 100), // Convert to cents and rounded to avoid floating point issues
@@ -28,6 +37,11 @@ export class PaymentService {
                 confirm: true,
                 payment_method: "pm_card_visa", // Replace with actual card ID or method
                 payment_method_types: ["card"],
+            })
+
+            this.notificationService.emit("notify-email", {
+                email,
+                text: `Your payment of $${amount.toFixed(2)} has been processed successfully.`,
             })
 
             return paymentIntent
