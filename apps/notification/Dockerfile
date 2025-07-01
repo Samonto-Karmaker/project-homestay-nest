@@ -1,14 +1,17 @@
 # Stage 1: Development
-FROM node:alpine As development
+FROM node:alpine AS development
 WORKDIR /usr/src/app
+
 COPY package*.json ./
+COPY tsconfig.json ./
+COPY apps/notification apps/notification
+COPY libs libs
+
 RUN npm install
-COPY . .
-EXPOSE 3004
 RUN npm run build
 
 # Stage 2: Production
-FROM node:alpine As production
+FROM node:alpine AS production
 
 ARG NODE_ENV=production
 ENV NODE_ENV=${NODE_ENV}
@@ -18,4 +21,6 @@ COPY package*.json ./
 RUN npm install --only=production
 COPY --from=development /usr/src/app/dist ./dist
 
-CMD [ "node", "dist/apps/notification/main" ]
+EXPOSE 3004
+
+CMD ["node", "dist/apps/notification/main.js"]
