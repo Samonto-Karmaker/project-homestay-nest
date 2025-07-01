@@ -4,11 +4,12 @@ WORKDIR /usr/src/app
 
 COPY package*.json ./
 COPY tsconfig.json ./
+COPY nest-cli.json ./
 COPY apps/payment apps/payment
 COPY libs libs
 
 RUN npm install
-RUN npm run build
+RUN npm run build payment
 
 # Stage 2: Production
 FROM node:alpine AS production
