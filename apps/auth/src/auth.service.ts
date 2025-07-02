@@ -11,10 +11,6 @@ export class AuthService {
         private readonly configService: ConfigService
     ) {}
 
-    getHello(): string {
-        return "Hello World!"
-    }
-
     login(user: User, res: Response) {
         const tokenPayload = {
             userId: user._id.toHexString(),
