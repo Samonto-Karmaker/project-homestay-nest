@@ -4,6 +4,7 @@ import { ReservationsController } from "./reservations.controller"
 import {
     AUTH_SERVICE,
     DbModule,
+    HealthModule,
     LoggerModule,
     PAYMENT_SERVICE,
 } from "@app/common"
@@ -58,6 +59,7 @@ import { ClientsModule, Transport } from "@nestjs/microservices"
                 inject: [ConfigService],
             },
         ]),
+        HealthModule,
     ],
     controllers: [ReservationsController],
     providers: [ReservationsService, ReservationsRepository],
