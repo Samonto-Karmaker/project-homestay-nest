@@ -13,7 +13,7 @@ describe("Health-Check", () => {
     test("payment", done => {
         ping(
             {
-                address: "payments",
+                address: "payment",
                 port: 3003,
             },
             err => {
@@ -25,7 +25,7 @@ describe("Health-Check", () => {
     test("notification", done => {
         ping(
             {
-                address: "notifications",
+                address: "notification",
                 port: 3003,
             },
             err => {

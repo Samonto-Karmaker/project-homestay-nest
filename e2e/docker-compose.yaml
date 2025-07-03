@@ -8,8 +8,8 @@ services:
     depends_on:
       - reservations
       - auth
-      - payments
-      - notifications
+      - payment
+      - notification
       - mongo
   reservations:
     build:
@@ -27,7 +27,7 @@ services:
       - ../apps/auth/.env
     ports:
       - '3001:3001'
-  payments:
+  payment:
     build:
       context: ..
       dockerfile: ./apps/payment/Dockerfile
@@ -35,7 +35,7 @@ services:
       - ../apps/payment/.env
     ports:
       - '3003:3003'
-  notifications:
+  notification:
     build:
       context: ..
       dockerfile: ./apps/notification/Dockerfile
