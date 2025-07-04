@@ -11,10 +11,19 @@ async function bootstrap() {
     const configService = app.get(ConfigService)
 
     app.connectMicroservice({
-        transport: Transport.TCP,
+        transport: Transport.RMQ,
         options: {
-            host: "0.0.0.0",
-            port: configService.get<number>("TCP_PORT", 3002), // Default TCP port
+            urls: [
+                configService.get<string>(
+                    "RABBITMQ_URL",
+                    "amqp://rabbitmq:5672"
+                ),
+            ],
+            queue: configService.get<string>("RABBITMQ_QUEUE", "auth"),
+            queueOptions: {
+                durable: true, // Ensure the queue is durable that is it will survive a broker restart
+            },
+            prefetchCount: 1, // Limit the number of messages sent over the channel before an ack is received
         },
     })
 
