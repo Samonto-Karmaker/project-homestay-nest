@@ -1,6 +1,10 @@
+import { Roles } from "@app/common"
 import {
+    IsArray,
     IsEmail,
+    IsEnum,
     IsNotEmpty,
+    IsOptional,
     IsString,
     IsStrongPassword,
 } from "class-validator"
@@ -31,4 +35,13 @@ export class CreateUserDto {
         message: "Password is required",
     })
     password: string
+
+    @IsOptional()
+    @IsArray()
+    @IsString({ each: true, message: "Role must be a string" })
+    @IsEnum(Roles, {
+        each: true,
+        message: `Role must be one of the following: ${Object.values(Roles).join(", ")}`,
+    })
+    role?: string[] // Optional, can be used to assign roles like 'admin', 'user', etc.
 }
