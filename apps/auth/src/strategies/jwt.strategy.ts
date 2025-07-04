@@ -16,11 +16,22 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
     ) {
         super({
             jwtFromRequest: ExtractJwt.fromExtractors([
-                (req: Request) =>
-                    req?.cookies?.Authentication ||
-                    req?.headers?.authentication ||
-                    req?.headers?.Authorization ||
-                    null,
+                (req: Request) => {
+                    if (req?.cookies?.Authentication) {
+                        return req.cookies.Authentication as string
+                    }
+                    // Only access Authentication if it exists and is a string
+                    if (typeof (req as any)?.Authentication === "string") {
+                        return (req as any).Authentication as string
+                    }
+                    if (typeof req?.headers?.authentication === "string") {
+                        return req.headers.authentication
+                    }
+                    if (typeof req?.headers?.Authorization === "string") {
+                        return req.headers.Authorization
+                    }
+                    return null
+                },
             ]),
             ignoreExpiration: false,
             secretOrKey: (() => {
