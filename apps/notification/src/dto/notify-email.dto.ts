@@ -1,6 +1,7 @@
+import { NotifyEmailMessage } from "@app/common"
 import { IsEmail, IsNotEmpty, IsString } from "class-validator"
 
-export class NotifyEmailDto {
+export class NotifyEmailDto implements NotifyEmailMessage {
     @IsEmail()
     @IsNotEmpty()
     email: string
