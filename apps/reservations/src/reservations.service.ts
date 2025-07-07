@@ -1,26 +1,38 @@
-/* eslint-disable @typescript-eslint/no-unsafe-member-access */
-/* eslint-disable @typescript-eslint/no-unsafe-assignment */
-import { Inject, Injectable } from "@nestjs/common"
+import { Inject, Injectable, OnModuleInit } from "@nestjs/common"
 import { CreateReservationDto } from "./dto/create-reservation.dto"
 import { UpdateReservationDto } from "./dto/update-reservation.dto"
 import { ReservationsRepository } from "./reservations.repository"
-import { PAYMENT_SERVICE, UserDto } from "@app/common"
-import { ClientProxy } from "@nestjs/microservices"
+import {
+    PAYMENT_SERVICE_NAME,
+    PaymentServiceClient,
+    UserDto,
+} from "@app/common"
+import { ClientGrpc } from "@nestjs/microservices"
 import { map } from "rxjs"
 
 @Injectable()
-export class ReservationsService {
+export class ReservationsService implements OnModuleInit {
+    private paymentService: PaymentServiceClient
+
     constructor(
         private readonly reservationsRepository: ReservationsRepository,
-        @Inject(PAYMENT_SERVICE) private readonly paymentService: ClientProxy
+        @Inject(PAYMENT_SERVICE_NAME)
+        private readonly paymentClient: ClientGrpc
     ) {}
+
+    onModuleInit() {
+        this.paymentService =
+            this.paymentClient.getService<PaymentServiceClient>(
+                PAYMENT_SERVICE_NAME
+            )
+    }
 
     create(
         createReservationDto: CreateReservationDto,
         { _id: userId, email }: UserDto
     ) {
         return this.paymentService
-            .send("createPaymentIntent", {
+            .createPaymentIntent({
                 ...createReservationDto.paymentIntent,
                 email,
             })
