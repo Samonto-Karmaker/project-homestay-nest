@@ -4,10 +4,15 @@ import { LocalAuthGuard } from "./guards/local-auth.guard"
 import { CurrentUser } from "@app/common/decorators/current-user.decorator"
 import { User } from "./entities/user.entity"
 import { Response } from "express"
-import { MessagePattern, Payload } from "@nestjs/microservices"
+import { Payload } from "@nestjs/microservices"
 import { JwtAuthGuard } from "./guards/jwt-auth.guard"
+import { AuthServiceControllerMethods } from "@app/common"
 
 @Controller()
+@AuthServiceControllerMethods()
+// Not implementing AuthServiceController to avoid type conflicts.
+// The gRPC method signature expects a raw Authentication object,
+// but we are using guards to inject a fully hydrated User.
 export class AuthController {
     constructor(private readonly authService: AuthService) {}
 
@@ -20,9 +25,15 @@ export class AuthController {
         return this.authService.login(user, res)
     }
 
+    // Even though this is a gRPC method, we use @Payload to access the user object
+    // injected by JwtAuthGuard. The guard resolves the raw token to a full user.
     @UseGuards(JwtAuthGuard)
-    @MessagePattern("authenticate")
     authenticate(@Payload() data: { user: User }) {
-        return data.user
+        return {
+            id: data.user._id,
+            email: data.user.email,
+            username: data.user.username,
+            role: data.user.role,
+        }
     }
 }
