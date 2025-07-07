@@ -3,8 +3,13 @@ import { PaymentController } from "./payment.controller"
 import { PaymentService } from "./payment.service"
 import * as Joi from "joi"
 import { ConfigModule, ConfigService } from "@nestjs/config"
-import { LoggerModule, NOTIFICATION_SERVICE } from "@app/common"
+import {
+    LoggerModule,
+    NOTIFICATION_PACKAGE_NAME,
+    NOTIFICATION_SERVICE_NAME,
+} from "@app/common"
 import { ClientsModule, Transport } from "@nestjs/microservices"
+import { join } from "path"
 
 @Module({
     imports: [
@@ -20,12 +25,18 @@ import { ClientsModule, Transport } from "@nestjs/microservices"
         }),
         ClientsModule.registerAsync([
             {
-                name: NOTIFICATION_SERVICE,
+                name: NOTIFICATION_SERVICE_NAME,
                 useFactory: (configService: ConfigService) => ({
-                    transport: Transport.TCP,
+                    transport: Transport.GRPC,
                     options: {
-                        host: configService.get<string>("NOTIFICATION_HOST"),
-                        port: configService.get<number>("NOTIFICATION_PORT"),
+                        package: NOTIFICATION_PACKAGE_NAME,
+                        protoPath: join(
+                            __dirname,
+                            "../../../proto/notification.proto"
+                        ),
+                        url: configService.getOrThrow<string>(
+                            "NOTIFICATION_GRPC_URL"
+                        ),
                     },
                 }),
                 inject: [ConfigService],

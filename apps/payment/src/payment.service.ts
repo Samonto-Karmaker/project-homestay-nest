@@ -1,18 +1,22 @@
 import { Inject, Injectable } from "@nestjs/common"
 import { ConfigService } from "@nestjs/config"
 import Stripe from "stripe"
-import { NOTIFICATION_SERVICE } from "@app/common"
-import { ClientProxy } from "@nestjs/microservices"
+import {
+    NOTIFICATION_SERVICE_NAME,
+    NotificationServiceClient,
+} from "@app/common"
+import { ClientGrpc } from "@nestjs/microservices"
 import { CreatePaymentIntentWithEmailDto } from "./dto/create-payment-intent-with-email.dto"
 
 @Injectable()
 export class PaymentService {
     private readonly stripe: Stripe
+    private notificationService: NotificationServiceClient
 
     constructor(
         private readonly configService: ConfigService,
-        @Inject(NOTIFICATION_SERVICE)
-        private readonly notificationService: ClientProxy
+        @Inject(NOTIFICATION_SERVICE_NAME)
+        private readonly notificationClient: ClientGrpc
     ) {
         this.stripe = new Stripe(
             this.configService.get<string>("STRIPE_SECRET_KEY") ??
@@ -39,10 +43,21 @@ export class PaymentService {
                 payment_method_types: ["card"],
             })
 
-            this.notificationService.emit("notify-email", {
-                email,
-                text: `Your payment of $${amount.toFixed(2)} has been processed successfully.`,
-            })
+            if (!this.notificationService) {
+                this.notificationService =
+                    this.notificationClient.getService<NotificationServiceClient>(
+                        NOTIFICATION_SERVICE_NAME
+                    )
+            }
+
+            this.notificationService
+                .notifyEmail({
+                    email,
+                    text: `Your payment of $${amount.toFixed(2)} has been processed successfully.`,
+                })
+                .subscribe(() => {
+                    console.log("Notification sent successfully")
+                })
 
             return paymentIntent
         } catch (error) {

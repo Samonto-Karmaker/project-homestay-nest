@@ -1,16 +1,19 @@
 import { Controller, UsePipes, ValidationPipe } from "@nestjs/common"
 import { PaymentService } from "./payment.service"
-import { MessagePattern, Payload } from "@nestjs/microservices"
 import { CreatePaymentIntentWithEmailDto } from "./dto/create-payment-intent-with-email.dto"
+import {
+    PaymentServiceController,
+    PaymentServiceControllerMethods,
+} from "@app/common"
 
 @Controller()
-export class PaymentController {
+@PaymentServiceControllerMethods()
+export class PaymentController implements PaymentServiceController {
     constructor(private readonly paymentService: PaymentService) {}
 
-    @MessagePattern("createPaymentIntent")
     @UsePipes(new ValidationPipe())
     createPaymentIntent(
-        @Payload() createPaymentIntentDto: CreatePaymentIntentWithEmailDto
+        createPaymentIntentDto: CreatePaymentIntentWithEmailDto
     ) {
         return this.paymentService.createPaymentIntent(createPaymentIntentDto)
     }
