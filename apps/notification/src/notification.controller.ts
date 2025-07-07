@@ -1,14 +1,17 @@
 import { Controller } from "@nestjs/common"
 import { NotificationService } from "./notification.service"
-import { EventPattern, Payload } from "@nestjs/microservices"
 import { NotifyEmailDto } from "./dto/notify-email.dto"
+import {
+    NotificationServiceController,
+    NotificationServiceControllerMethods,
+} from "@app/common"
 
 @Controller()
-export class NotificationController {
+@NotificationServiceControllerMethods()
+export class NotificationController implements NotificationServiceController {
     constructor(private readonly notificationService: NotificationService) {}
 
-    @EventPattern("notify-email")
-    notifyEmail(@Payload() data: NotifyEmailDto) {
+    notifyEmail(data: NotifyEmailDto) {
         return this.notificationService.notifyEmail(data)
     }
 }

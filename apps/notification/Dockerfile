@@ -7,6 +7,7 @@ COPY tsconfig.json ./
 COPY nest-cli.json ./
 COPY apps/notification apps/notification
 COPY libs libs
+COPY proto proto
 
 RUN npm install
 RUN npm run build notification
@@ -21,6 +22,7 @@ WORKDIR /usr/src/app
 COPY package*.json ./
 RUN npm install --only=production
 COPY --from=development /usr/src/app/dist ./dist
+COPY proto proto
 
 EXPOSE 3004
 
