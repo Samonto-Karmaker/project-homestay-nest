@@ -1,0 +1,16 @@
+syntax = "proto3";
+
+package payment;
+
+service PaymentService {
+    rpc CreatePaymentIntent (CreatePaymentIntentRequest) returns (CreatePaymentIntentResponse) {}
+}
+
+message CreatePaymentIntentRequest {
+    int32 amount = 1; // Amount in cents
+    string email = 2;
+}
+
+message CreatePaymentIntentResponse {
+    string id = 1; 
+}
