@@ -8,7 +8,7 @@ import {
     UserDto,
 } from "@app/common"
 import { ClientGrpc } from "@nestjs/microservices"
-import { map } from "rxjs"
+import { catchError, map } from "rxjs"
 
 @Injectable()
 export class ReservationsService implements OnModuleInit {
@@ -33,8 +33,8 @@ export class ReservationsService implements OnModuleInit {
     ) {
         return this.paymentService
             .createPaymentIntent({
-                ...createReservationDto.paymentIntent,
-                email,
+                amount: createReservationDto.paymentIntent.amount,
+                email: email,
             })
             .pipe(
                 map(res => {
@@ -44,6 +44,10 @@ export class ReservationsService implements OnModuleInit {
                         userId,
                         timestamp: new Date(),
                     })
+                }),
+                catchError(err => {
+                    console.error("Error creating payment intent:", err)
+                    throw new Error("Payment intent creation failed")
                 })
             )
     }

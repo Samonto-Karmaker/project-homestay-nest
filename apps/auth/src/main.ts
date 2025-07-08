@@ -13,7 +13,7 @@ async function bootstrap() {
     const configService = app.get(ConfigService)
 
     app.connectMicroservice({
-        transport: Transport.TCP,
+        transport: Transport.GRPC,
         options: {
             package: AUTH_PACKAGE_NAME,
             protoPath: join(__dirname, "../../../proto/auth.proto"),
