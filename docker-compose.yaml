@@ -63,6 +63,26 @@ services:
       - .:/usr/src/app
     depends_on:
       - mongo
+  gateway:
+    build:
+      context: .
+      dockerfile: ./apps/gateway/Dockerfile
+      target: development
+    command: npm run start:dev gateway
+    env_file:
+      - ./apps/gateway/.env
+    environment:
+      - MONGODB_URI=mongodb://mongo:27017/project-homestay-nest
+    volumes:
+      - .:/usr/src/app
+    ports:
+      - "3005:3005"
+    depends_on:
+      - reservations
+      - auth
+      - payment
+      - notification
+      - mongo
   mongo:
     image: mongo:latest
     container_name: reservations_mongo
