@@ -1,10 +1,16 @@
+import { LoggerModule } from "@app/common"
 import { Module } from "@nestjs/common"
-import { GatewayController } from "./gateway.controller"
-import { GatewayService } from "./gateway.service"
+import { ConfigModule } from "@nestjs/config"
 
 @Module({
-    imports: [],
-    controllers: [GatewayController],
-    providers: [GatewayService],
+    imports: [
+        ConfigModule.forRoot({
+            isGlobal: true,
+            envFilePath: "apps/gateway/.env",
+        }),
+        LoggerModule,
+    ],
+    controllers: [],
+    providers: [],
 })
 export class GatewayModule {}
