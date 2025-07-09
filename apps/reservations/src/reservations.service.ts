@@ -6,7 +6,7 @@ import { UpdateReservationDto } from "./dto/update-reservation.dto"
 import { ReservationsRepository } from "./reservations.repository"
 import { PAYMENT_SERVICE, UserDto } from "@app/common"
 import { ClientProxy } from "@nestjs/microservices"
-import { map } from "rxjs"
+import { catchError, map } from "rxjs"
 
 @Injectable()
 export class ReservationsService {
@@ -21,7 +21,7 @@ export class ReservationsService {
     ) {
         return this.paymentService
             .send("createPaymentIntent", {
-                ...createReservationDto.paymentIntent,
+                amount: createReservationDto.paymentIntent.amount,
                 email,
             })
             .pipe(
@@ -32,6 +32,10 @@ export class ReservationsService {
                         userId,
                         timestamp: new Date(),
                     })
+                }),
+                catchError(err => {
+                    console.error("Error creating payment intent:", err)
+                    throw new Error("Payment intent creation failed")
                 })
             )
     }
